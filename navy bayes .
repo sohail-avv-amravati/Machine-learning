@@ -1,0 +1,65 @@
+import pandas as pd
+
+conditional_probs={}
+
+def prior_prob(df):
+    counts=df.iloc[:,target_idx].value_counts()
+    total=len(df)
+    probabilities=counts/total
+    return probabilities
+
+def conditional_prob(df,feature_idx,target_idx):
+    classes=df.iloc[:,target_idx].unique()
+    feature_values=df.iloc[:,feature_idx].unique()
+    feature_name=df.columns[feature_idx]
+    for cls in classes:
+        if cls not in conditional_probs:
+            conditional_probs[cls]={}
+        if feature_name not in conditional_probs[cls]:
+            conditional_probs[cls][feature_name]={}
+        filtered_df=df[df.iloc[:,target_idx]==cls]
+        total=len(filtered_df)
+        print("\nClass:",cls)
+        for value in feature_values:
+            count=len(filtered_df[filtered_df.iloc[:,feature_idx]==value])
+            probability=count/total
+            conditional_probs[cls][feature_name][value]=probability
+            print(value,count,probability)
+
+def predict():
+    user_input=[]
+    for i in range(target_idx):
+        user_input.append(input("Enter "+features_set[i]+": "))
+    prior=prior_prob(df)
+    max_prob=0
+    predicted=""
+    for cls in prior.index:
+        posterior=prior[cls]
+        for i in range(target_idx):
+            posterior=posterior*conditional_probs[cls][features_set[i]][user_input[i]]
+        print(cls,posterior)
+        if posterior>max_prob:
+            max_prob=posterior
+            predicted=cls
+    print("Predicted Target Value:",predicted)
+
+df=pd.read_csv("student_data.csv")
+r_count=len(df)
+c_count=len(df.columns)
+target_idx=c_count-1
+target_set=df.columns[target_idx]
+features_set=[0]*target_idx
+for i in range(target_idx):
+    features_set[i]=df.columns[i]
+print("The target to find is:",target_set)
+print("The features to find target value are:",features_set)
+for i in range(target_idx):
+    conditional_prob(df,i,target_idx)
+print("\nPrior Probabilities")
+print(prior_prob(df))
+print("\nLikelihoods")
+print(conditional_probs)
+n=int(input("\nEnter number of test cases: "))
+for i in range(n):
+    print("\nTest Case",i+1)
+    predict()
