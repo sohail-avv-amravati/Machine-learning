@@ -1,0 +1,38 @@
+import numpy as np
+
+w = float(input("Enter the w: "))
+b = float(input("Enter the b: "))
+N = int(input("Enter number of observations: "))
+
+X = np.zeros(N)
+Y = np.zeros(N)
+Y_pred = np.zeros(N)
+
+for i in range(N):
+    X[i] = int(input(f"Enter the input x{i+1}: "))
+    Y[i] = int(input(f"Enter the output y{i+1}: "))
+
+alpha = float(input("Enter the learning rate: "))
+epoch = int(input("Enter number of epochs: "))
+
+for j in range(epoch):
+    print(f"\nEpoch {j+1}")
+
+    for k in range(N):
+        Z = w * X[k] + b
+
+        if Z < 0:
+            Y_pred[k] = 0
+        else:
+            Y_pred[k] = 1
+
+        print("X =", X[k], "Actual Y =", Y[k],
+              "Predicted Y =", Y_pred[k])
+
+        if Y[k] != Y_pred[k]:
+            w = w + alpha * (Y[k] - Y_pred[k]) * X[k]
+            b = b + alpha * (Y[k] - Y_pred[k])
+
+        print("w =", w, "b =", b)
+
+print("\nFinal w and b are:", w, b)
